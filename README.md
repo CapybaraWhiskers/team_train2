@@ -7,22 +7,24 @@
 1. Docker と Docker Compose をインストールします。
 2. 初回起動時にマイグレーションを手動で実行します。
    ```bash
- docker compose up db -d
-  # Linux/Mac の場合
- docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
-  docker compose exec -T db psql -U postgres -d attendance < backend/migrations/002_seed_admin.sql
+   docker compose up db -d
+   ```
+  ## Linux/Mac の場合
+  ```bash
+   docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
+   docker compose exec -T db psql -U postgres -d attendance < backend/migrations/002_seed_admin.sql
    ```
    PowerShell では `<` リダイレクトが使用できないため、次のようにファイル内容をパイプで渡してください。
    ```powershell
    # PowerShell
    Get-Content backend/migrations/001_create_tables.sql | docker compose exec -T db psql -U postgres -d attendance
    ```
-3. サービスを起動します。
+1. サービスを起動します。
    ```bash
- docker compose up
-  ```
-4. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
-5. `ADMIN_EMAILS` 環境変数で管理者アカウントのメールアドレスをカンマ区切りで指定できます。デフォルトでは `admin@example.com` が含まれています。
+   docker compose up
+   ```
+2. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
+3. `ADMIN_EMAILS` 環境変数で管理者アカウントのメールアドレスをカンマ区切りで指定できます。デフォルトでは `admin@example.com` が含まれています。
 
 フロントエンドは静的 HTML で構成されているためビルド工程はありません。そのまま nginx コンテナから配信されます。
 

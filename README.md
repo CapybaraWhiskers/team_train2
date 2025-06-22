@@ -1,50 +1,77 @@
-# Attendance & Daily Report Management System
+# 勤怠・日報管理システム
 
-This project is a sample corporate attendance management system. It includes a backend API using Node.js/Express, a static frontend served via nginx, and PostgreSQL database. All components run locally via Docker Compose.
+このプロジェクトは社内向けのサンプル勤怠管理システムです。Node.js/Express で動作するバックエンド API、nginx で配信される静的フロントエンド、そして PostgreSQL データベースを含みます。すべてのコンポーネントは Docker Compose を使ってローカルで実行できます。
 
-## Local Setup
+## ローカル環境のセットアップ
 
-1. Install Docker and Docker Compose.
-2. Run migrations manually on first start:
+1. Docker と Docker Compose をインストールします。
+2. 初回起動時にマイグレーションを手動で実行します。
    ```bash
    docker compose up db -d
-   # Linux/Mac
+   # Linux/Mac の場合
    docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
    ```
-   PowerShell does not support the `<` redirection syntax with `docker compose exec`,
-   so pipe the file content instead:
+   PowerShell では `<` リダイレクトが使用できないため、次のようにファイル内容をパイプで渡してください。
    ```powershell
    # PowerShell
    Get-Content backend/migrations/001_create_tables.sql | docker compose exec -T db psql -U postgres -d attendance
    ```
-3. Start the stack:
+3. サービスを起動します。
    ```bash
    docker compose up
    ```
-4. Access the frontend at <http://localhost:8080> and API at <http://localhost:3000>.
+4. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
 
-Run tests:
+テスト実行方法:
 ```bash
 cd backend
 npm install
 npm test
 ```
 
-## VM Deployment
+## Windows でのテスト手順
 
-1. Create an Azure VM (Linux recommended) and install Docker.
-2. Clone this repository to the VM.
-3. Ensure database port `5432` is firewalled to localhost only.
-4. Run the same `docker compose up` command.
-5. Configure environment variables for Microsoft Entra ID in `docker-compose.yml`.
-6. Update the VM regularly using system package manager (e.g., `apt update && apt upgrade`).
+Windows 環境でアプリを動作確認する場合は、PowerShell で以下の手順を実行します。
 
-Migration scripts are located in `backend/migrations/`.
+1. リポジトリをクローンして移動します。
+   ```powershell
+   git clone https://github.com/<your-account>/team_train2.git
+   cd team_train2
+   ```
+2. 依存パッケージをインストールしてテストを実行します。
+   ```powershell
+   cd backend
+   npm install
+   npm install express-session   # 必要に応じて追加
+   npm test
+   cd ..
+   ```
+3. データベースを起動し、マイグレーションを適用します。
+   ```powershell
+   docker compose up db -d
+   Get-Content backend/migrations/001_create_tables.sql | docker compose exec -T db psql -U postgres -d attendance
+   ```
+4. すべてのコンテナを起動します。
+   ```powershell
+   docker compose up
+   ```
+   フロントエンドは <http://localhost:8080/> 、API のヘルスチェックは <http://localhost:3000/health> で確認できます。
 
-## Architecture
+## VM 環境へのデプロイ
 
-ER Diagram and sequence diagram are located in the `docs/` folder.
+1. Azure などで Linux VM を作成し、Docker をインストールします。
+2. その VM に本リポジトリをクローンします。
+3. データベース用ポート `5432` はローカルホストのみに開放するようファイアウォールを設定します。
+4. ローカル環境と同様に `docker compose up` を実行します。
+5. `docker-compose.yml` 内で Microsoft Entra ID 用の環境変数を設定します。
+6. `apt update && apt upgrade` など、パッケージマネージャーを使って定期的に VM を更新してください。
 
-## CI/CD (Optional)
+マイグレーションスクリプトは `backend/migrations/` にあります。
 
-A GitHub Actions workflow (`.github/workflows/nodejs.yml`) is provided for those who want to challenge integrating CI/CD.
+## アーキテクチャ
+
+ER 図やシーケンス図は `docs/` フォルダーに配置しています。
+
+## CI/CD（任意）
+
+CI/CD を試したい方向けに、GitHub Actions のワークフロー (`.github/workflows/nodejs.yml`) を用意しています。

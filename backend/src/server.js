@@ -12,6 +12,7 @@ const { getOrCreateUser } = require('./userService');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Database connection
 const pool = new Pool({

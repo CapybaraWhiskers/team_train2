@@ -8,7 +8,14 @@ This project is a sample corporate attendance management system. It includes a b
 2. Run migrations manually on first start:
    ```bash
    docker compose up db -d
-   docker compose exec db psql -U postgres -d attendance -f /usr/src/app/migrations/001_create_tables.sql
+   # Linux/Mac
+   docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
+   ```
+   PowerShell does not support the `<` redirection syntax with `docker compose exec`,
+   so pipe the file content instead:
+   ```powershell
+   # PowerShell
+   Get-Content backend/migrations/001_create_tables.sql | docker compose exec -T db psql -U postgres -d attendance
    ```
 3. Start the stack:
    ```bash

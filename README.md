@@ -7,9 +7,10 @@
 1. Docker と Docker Compose をインストールします。
 2. 初回起動時にマイグレーションを手動で実行します。
    ```bash
-   docker compose up db -d
-   # Linux/Mac の場合
-   docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
+ docker compose up db -d
+  # Linux/Mac の場合
+ docker compose exec -T db psql -U postgres -d attendance < backend/migrations/001_create_tables.sql
+  docker compose exec -T db psql -U postgres -d attendance < backend/migrations/002_seed_admin.sql
    ```
    PowerShell では `<` リダイレクトが使用できないため、次のようにファイル内容をパイプで渡してください。
    ```powershell
@@ -18,9 +19,12 @@
    ```
 3. サービスを起動します。
    ```bash
-   docker compose up
-   ```
+ docker compose up
+  ```
 4. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
+5. `ADMIN_EMAILS` 環境変数で管理者アカウントのメールアドレスをカンマ区切りで指定できます。デフォルトでは `admin@example.com` が含まれています。
+
+フロントエンドは静的 HTML で構成されているためビルド工程はありません。そのまま nginx コンテナから配信されます。
 
 テスト実行方法:
 ```bash
@@ -75,3 +79,7 @@ ER 図やシーケンス図は `docs/` フォルダーに配置しています�
 ## CI/CD（任意）
 
 CI/CD を試したい方向けに、GitHub Actions のワークフロー (`.github/workflows/nodejs.yml`) を用意しています。
+
+## UI スクリーンショット
+
+ダッシュボード、日報入力画面、管理者ダッシュボードの例をここに掲載する予定です。(画像ファイルはリポジトリには含めていません)

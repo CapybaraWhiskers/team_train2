@@ -10,7 +10,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
 
   api:
     build: ./backend
@@ -20,6 +20,7 @@ services:
       AZURE_CLIENT_ID: change_me
       AZURE_CLIENT_SECRET: change_me
       AZURE_TENANT_ID: change_me
+      ADMIN_EMAILS: admin@example.com
     depends_on:
       - db
     volumes:

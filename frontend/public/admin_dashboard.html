@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  <table id="table" border="1"></table>
+  <button id="csv">Download CSV</button>
+  <script>
+  async function load(){
+    const res = await fetch('/admin/hours');
+    if(res.ok){
+      const data = await res.json();
+      const rows = data.map(u => `<tr><td>${u.email}</td><td>${u.hours}</td></tr>`).join('');
+      document.getElementById('table').innerHTML = '<tr><th>Email</th><th>Hours</th></tr>' + rows;
+    }
+  }
+  document.getElementById('csv').onclick = () => { window.location='/admin/export-hours'; };
+  load();
+  </script>
+</body>
+</html>

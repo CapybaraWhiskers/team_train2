@@ -3,11 +3,12 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const { OIDCStrategy } = require('passport-azure-ad');
 const { Pool } = require('pg');
-const markdownIt = require('markdown-it');
 
 const authRoutes = require('./routes/auth');
 const attendanceRoutes = require('./routes/attendance');
 const reportRoutes = require('./routes/report');
+const adminRoutes = require('./routes/admin');
+const { getOrCreateUser } = require('./userService');
 
 const app = express();
 app.use(bodyParser.json());
@@ -37,14 +38,8 @@ passport.use(new OIDCStrategy(oidcConfig, async (iss, sub, profile, accessToken,
   try {
     const email = profile._json.preferred_username;
     const db = pool;
-    let result = await db.query('SELECT * FROM users WHERE email=$1', [email]);
-    let user;
-    if (result.rows.length === 0) {
-      result = await db.query('INSERT INTO users(email, role) VALUES($1, $2) RETURNING *', [email, 'user']);
-      user = result.rows[0];
-    } else {
-      user = result.rows[0];
-    }
+    // Determine role and create the user if necessary
+    const user = await getOrCreateUser(email, db);
     return done(null, user);
   } catch (err) {
     return done(err);
@@ -71,6 +66,16 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/attendance', attendanceRoutes);
 app.use('/report', reportRoutes);
+app.use('/admin', adminRoutes);
+
+// Return basic user information to the frontend
+app.get('/me', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ id: req.user.id, email: req.user.email, role: req.user.role });
+  } else {
+    res.status(401).json({ error: 'unauthenticated' });
+  }
+});
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

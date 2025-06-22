@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <style>
+    #preview { border: 1px solid #ccc; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <button id="clockIn">Clock In</button>
+  <button id="clockOut">Clock Out</button>
+  <div id="result"></div>
+  <div id="summary"></div>
+  <p>
+    <a href="/reports/new">New Report</a> |
+    <a href="/reports">My Reports</a> |
+    <a href="/admin/dashboard" id="adminLink" style="display:none;">Admin Dashboard</a>
+  </p>
+<script>
+async function refreshSummary() {
+  const res = await fetch('/attendance/summary');
+  if(res.ok){
+    const data = await res.json();
+    document.getElementById('summary').textContent = `This month: ${data.totalHours.toFixed(2)}h (utilization ${data.utilization}%)`;
+  }
+}
+
+document.getElementById('clockIn').onclick = async () => {
+  const res = await fetch('/attendance/clock-in', {method:'POST'});
+  document.getElementById('result').textContent = res.ok ? 'Clocked in' : 'Error';
+  refreshSummary();
+};
+
+document.getElementById('clockOut').onclick = async () => {
+  const res = await fetch('/attendance/clock-out', {method:'POST'});
+  document.getElementById('result').textContent = res.ok ? 'Clocked out' : 'Error';
+  refreshSummary();
+};
+
+async function init(){
+  const me = await fetch('/me');
+  if(me.ok){
+    const user = await me.json();
+    if(user.role === 'admin') document.getElementById('adminLink').style.display='inline';
+  }
+  refreshSummary();
+}
+init();
+</script>
+</body>
+</html>

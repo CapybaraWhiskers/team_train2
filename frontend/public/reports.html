@@ -9,7 +9,7 @@
   <div id="list"></div>
   <script>
   async function load(){
-    const res = await fetch('/report/');
+    const res = await fetch('/api/report/');
     if(res.ok){
       const list = await res.json();
       document.getElementById('list').innerHTML = list.map(r => `<h3>${r.date}</h3>`+r.html).join('');

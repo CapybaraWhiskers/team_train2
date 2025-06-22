@@ -19,7 +19,7 @@
   });
 
   document.getElementById('submit').onclick = async () => {
-    const res = await fetch('/report/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({markdown: ta.value})});
+    const res = await fetch('/api/report/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({markdown: ta.value})});
     if(res.ok){
       location.href = '/reports';
     }else{

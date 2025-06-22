@@ -10,14 +10,14 @@
   <button id="csv">Download CSV</button>
   <script>
   async function load(){
-    const res = await fetch('/admin/hours');
+    const res = await fetch('/api/admin/hours');
     if(res.ok){
       const data = await res.json();
       const rows = data.map(u => `<tr><td>${u.email}</td><td>${u.hours}</td></tr>`).join('');
       document.getElementById('table').innerHTML = '<tr><th>Email</th><th>Hours</th></tr>' + rows;
     }
   }
-  document.getElementById('csv').onclick = () => { window.location='/admin/export-hours'; };
+  document.getElementById('csv').onclick = () => { window.location='/api/admin/export-hours'; };
   load();
   </script>
 </body>

@@ -21,7 +21,7 @@
   </p>
 <script>
 async function refreshSummary() {
-  const res = await fetch('/attendance/summary');
+  const res = await fetch('/api/attendance/summary');
   if(res.ok){
     const data = await res.json();
     document.getElementById('summary').textContent = `This month: ${data.totalHours.toFixed(2)}h (utilization ${data.utilization}%)`;
@@ -29,19 +29,19 @@ async function refreshSummary() {
 }
 
 document.getElementById('clockIn').onclick = async () => {
-  const res = await fetch('/attendance/clock-in', {method:'POST'});
+  const res = await fetch('/api/attendance/clock-in', {method:'POST'});
   document.getElementById('result').textContent = res.ok ? 'Clocked in' : 'Error';
   refreshSummary();
 };
 
 document.getElementById('clockOut').onclick = async () => {
-  const res = await fetch('/attendance/clock-out', {method:'POST'});
+  const res = await fetch('/api/attendance/clock-out', {method:'POST'});
   document.getElementById('result').textContent = res.ok ? 'Clocked out' : 'Error';
   refreshSummary();
 };
 
 async function init(){
-  const me = await fetch('/me');
+  const me = await fetch('/api/me');
   if(me.ok){
     const user = await me.json();
     if(user.role === 'admin') document.getElementById('adminLink').style.display='inline';

@@ -2,11 +2,7 @@ const express = require('express');
 const MarkdownIt = require('markdown-it');
 const router = express.Router();
 const md = new MarkdownIt();
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.status(401).json({ error: 'unauthenticated' });
-}
+const { ensureAuthenticated } = require('../middleware');
 
 router.post('/', ensureAuthenticated, async (req, res) => {
   const db = req.app.get('db');
@@ -19,6 +15,18 @@ router.post('/', ensureAuthenticated, async (req, res) => {
   const markdown = req.body.markdown || '';
   await db.query('INSERT INTO reports(user_id, report_date, markdown) VALUES($1, $2, $3) ON CONFLICT (user_id, report_date) DO UPDATE SET markdown=EXCLUDED.markdown', [userId, today, markdown]);
   res.json({ status: 'submitted' });
+});
+
+// List all reports for the authenticated user
+router.get('/', ensureAuthenticated, async (req, res) => {
+  const db = req.app.get('db');
+  const userId = req.user.id;
+  const result = await db.query('SELECT report_date, markdown FROM reports WHERE user_id=$1 ORDER BY report_date DESC', [userId]);
+  const list = result.rows.map(r => ({
+    date: r.report_date,
+    html: md.render(r.markdown)
+  }));
+  res.json(list);
 });
 
 router.get('/:date', ensureAuthenticated, async (req, res) => {

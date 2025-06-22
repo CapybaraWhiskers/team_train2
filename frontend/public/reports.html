@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Reports</title>
+</head>
+<body>
+  <h1>My Reports</h1>
+  <div id="list"></div>
+  <script>
+  async function load(){
+    const res = await fetch('/report/');
+    if(res.ok){
+      const list = await res.json();
+      document.getElementById('list').innerHTML = list.map(r => `<h3>${r.date}</h3>`+r.html).join('');
+    }
+  }
+  load();
+  </script>
+</body>
+</html>

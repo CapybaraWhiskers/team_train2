@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>New Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+</head>
+<body>
+  <h1>Submit Report</h1>
+  <textarea id="markdown" rows="10" cols="60"></textarea>
+  <div id="preview"></div>
+  <div id="error" style="color:red;"></div>
+  <button id="submit">Submit</button>
+  <script>
+  const md = window.markdownit();
+  const ta = document.getElementById('markdown');
+  ta.addEventListener('input', () => {
+    document.getElementById('preview').innerHTML = md.render(ta.value);
+  });
+
+  document.getElementById('submit').onclick = async () => {
+    const res = await fetch('/report/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({markdown: ta.value})});
+    if(res.ok){
+      location.href = '/reports';
+    }else{
+      const data = await res.json();
+      document.getElementById('error').textContent = data.error || 'error';
+    }
+  };
+  </script>
+</body>
+</html>

@@ -26,9 +26,7 @@
 4. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
 5. `ADMIN_EMAILS` 環境変数で管理者アカウントのメールアドレスをカンマ区切りで指定できます。デフォルトでは `admin@example.com` が含まれています。
 6. Microsoft Entra ID を利用せずにテストする場合は、環境変数 `USE_LOCAL_LOGIN=true` を設定すると `/api/auth/login` でシンプルなメールアドレス入力フォームが表示されます。Docker Compose を使用せずバックエンドを直接起動する場合は `http://localhost:3000/auth/login` を開いてください。
-
 フロントエンドは静的 HTML で構成されているためビルド工程はありません。そのまま nginx コンテナから配信されます。
-
 テスト実行方法:
 ```bash
 cd backend

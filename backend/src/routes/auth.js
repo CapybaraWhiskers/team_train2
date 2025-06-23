@@ -3,7 +3,13 @@ const passport = require('passport');
 const { getOrCreateUser } = require('../userService');
 const router = express.Router();
 
-const useLocal = process.env.USE_LOCAL_LOGIN === 'true';
+// Determine whether to use local login based on the same logic as server.js.
+const azureConfigured =
+  process.env.AZURE_CLIENT_ID &&
+  process.env.AZURE_CLIENT_SECRET &&
+  process.env.AZURE_TENANT_ID &&
+  process.env.AZURE_CLIENT_ID !== 'change_me';
+const useLocal = process.env.USE_LOCAL_LOGIN === 'true' || !azureConfigured;
 
 if (useLocal) {
   router.get('/login', (req, res) => {

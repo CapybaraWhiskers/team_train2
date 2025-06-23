@@ -10,6 +10,8 @@ const reportRoutes = require('./routes/report');
 const adminRoutes = require('./routes/admin');
 const { getOrCreateUser } = require('./userService');
 
+const useLocal = process.env.USE_LOCAL_LOGIN === 'true';
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,31 +23,32 @@ const pool = new Pool({
 
 app.set('db', pool);
 
-// Passport setup for Microsoft Entra ID (Azure AD)
-const oidcConfig = {
-  identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
-  clientID: process.env.AZURE_CLIENT_ID,
-  responseType: 'code',
-  responseMode: 'query',
-  redirectUrl: process.env.AZURE_REDIRECT_URL || 'http://localhost:3000/auth/openid/return',
-  allowHttpForRedirectUrl: true,
-  clientSecret: process.env.AZURE_CLIENT_SECRET,
-  validateIssuer: false,
-  passReqToCallback: false,
-  scope: ['profile', 'email']
-};
+if (!useLocal) {
+  // Passport setup for Microsoft Entra ID (Azure AD)
+  const oidcConfig = {
+    identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
+    clientID: process.env.AZURE_CLIENT_ID,
+    responseType: 'code',
+    responseMode: 'query',
+    redirectUrl: process.env.AZURE_REDIRECT_URL || 'http://localhost:3000/auth/openid/return',
+    allowHttpForRedirectUrl: true,
+    clientSecret: process.env.AZURE_CLIENT_SECRET,
+    validateIssuer: false,
+    passReqToCallback: false,
+    scope: ['profile', 'email']
+  };
 
-passport.use(new OIDCStrategy(oidcConfig, async (iss, sub, profile, accessToken, refreshToken, done) => {
-  try {
-    const email = profile._json.preferred_username;
-    const db = pool;
-    // Determine role and create the user if necessary
-    const user = await getOrCreateUser(email, db);
-    return done(null, user);
-  } catch (err) {
-    return done(err);
-  }
-}));
+  passport.use(new OIDCStrategy(oidcConfig, async (iss, sub, profile, accessToken, refreshToken, done) => {
+    try {
+      const email = profile._json.preferred_username;
+      const db = pool;
+      const user = await getOrCreateUser(email, db);
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  }));
+}
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

@@ -8,7 +8,7 @@ const useLocal = process.env.USE_LOCAL_LOGIN === 'true';
 if (useLocal) {
   router.get('/login', (req, res) => {
     res.send(
-      `<form method="post" action="/auth/login">` +
+      `<form method="post" action="/api/auth/login">` +
       `<input type="email" name="email" required />` +
       `<button type="submit">Login</button>` +
       `</form>`

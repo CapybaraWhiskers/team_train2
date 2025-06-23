@@ -25,10 +25,8 @@
    ```
 4. フロントエンドは <http://localhost:8080>、API は <http://localhost:3000> にアクセスします。
 5. `ADMIN_EMAILS` 環境変数で管理者アカウントのメールアドレスをカンマ区切りで指定できます。デフォルトでは `admin@example.com` が含まれています。
-6. Microsoft Entra ID を利用せずにテストする場合は、環境変数 `USE_LOCAL_LOGIN=true` を設定すると `/api/auth/login` でシンプルなメールアドレス入力フォームが表示されます。
-
+6. Microsoft Entra ID を利用せずにテストする場合は、環境変数 `USE_LOCAL_LOGIN=true` を設定すると `/api/auth/login` でシンプルなメールアドレス入力フォームが表示されます。Docker Compose を使用せずバックエンドを直接起動する場合は `http://localhost:3000/auth/login` を開いてください。
 フロントエンドは静的 HTML で構成されているためビルド工程はありません。そのまま nginx コンテナから配信されます。
-
 テスト実行方法:
 ```bash
 cd backend
@@ -60,6 +58,7 @@ Windows 環境でアプリを動作確認する場合は、PowerShell で以下�
    ```
 4. すべてのコンテナを起動します。
    ```powershell
+   $env:USE_LOCAL_LOGIN="true"   # ローカルログインを使う場合
    docker compose up
    ```
    フロントエンドは <http://localhost:8080/> 、API のヘルスチェックは <http://localhost:3000/health> で確認できます。

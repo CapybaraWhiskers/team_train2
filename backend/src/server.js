@@ -10,7 +10,15 @@ const reportRoutes = require('./routes/report');
 const adminRoutes = require('./routes/admin');
 const { getOrCreateUser } = require('./userService');
 
-const useLocal = process.env.USE_LOCAL_LOGIN === 'true';
+// Switch to local login when USE_LOCAL_LOGIN=true or when Azure AD
+// credentials are not properly configured. This allows easier local testing
+// without Microsoft Entra ID.
+const azureConfigured =
+  process.env.AZURE_CLIENT_ID &&
+  process.env.AZURE_CLIENT_SECRET &&
+  process.env.AZURE_TENANT_ID &&
+  process.env.AZURE_CLIENT_ID !== 'change_me';
+const useLocal = process.env.USE_LOCAL_LOGIN === 'true' || !azureConfigured;
 
 const app = express();
 app.use(bodyParser.json());
